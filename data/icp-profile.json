@@ -1,0 +1,84 @@
+{
+  "builtAt": "2026-04-28T10:03:48.903Z",
+  "totalPilotCompanies": 1065,
+  "icpGeoCompanies": 753,
+  "topIndustries": [
+    "Construction",
+    "Manufacturing",
+    "Retail",
+    "Business Services",
+    "Energy, Utilities & Waste",
+    "Real Estate",
+    "Consumer Services",
+    "Hospitality",
+    "Education",
+    "Holding Companies & Conglomerates",
+    "Finance",
+    "Healthcare Services",
+    "Software"
+  ],
+  "industryBreakdown": [
+    {
+      "name": "Construction",
+      "count": 570
+    },
+    {
+      "name": "Manufacturing",
+      "count": 81
+    },
+    {
+      "name": "Retail",
+      "count": 48
+    },
+    {
+      "name": "Business Services",
+      "count": 16
+    },
+    {
+      "name": "Energy, Utilities & Waste",
+      "count": 11
+    },
+    {
+      "name": "Real Estate",
+      "count": 8
+    },
+    {
+      "name": "Consumer Services",
+      "count": 7
+    },
+    {
+      "name": "Hospitality",
+      "count": 3
+    },
+    {
+      "name": "Education",
+      "count": 3
+    },
+    {
+      "name": "Holding Companies & Conglomerates",
+      "count": 2
+    },
+    {
+      "name": "Finance",
+      "count": 2
+    },
+    {
+      "name": "Healthcare Services",
+      "count": 1
+    },
+    {
+      "name": "Software",
+      "count": 1
+    }
+  ],
+  "minHeadcount": 6,
+  "maxHeadcount": 271,
+  "geos": [
+    "Australia",
+    "Canada",
+    "United States",
+    "United Kingdom",
+    "Ireland",
+    "South Africa"
+  ]
+}

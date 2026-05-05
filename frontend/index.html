@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B2B Outreach Agent</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'Segoe UI',sans-serif;background:#07070f;color:#e5e7eb;min-height:100vh;font-size:13px}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:#111}
+::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
+a{color:#818cf8;text-decoration:none}
+
+/* Layout */
+.shell{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:200px;background:#0d0d18;border-right:1px solid #1f2937;display:flex;flex-direction:column;flex-shrink:0;padding:0}
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+
+/* Sidebar */
+.logo{padding:18px 16px 14px;border-bottom:1px solid #1f2937}
+.logo h2{font-size:14px;font-weight:700;color:#fff;letter-spacing:-0.3px}
+.logo p{font-size:10px;color:#4b5563;margin-top:2px}
+.nav{padding:8px 0;flex:1}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 16px;cursor:pointer;border-radius:0;color:#6b7280;font-size:12px;font-weight:500;transition:all .15s;border-left:2px solid transparent}
+.nav-item:hover{color:#d1d5db;background:rgba(255,255,255,0.03)}
+.nav-item.active{color:#fff;background:rgba(99,102,241,0.1);border-left-color:#6366f1}
+.nav-icon{font-size:14px;width:16px;text-align:center}
+.sidebar-footer{padding:12px 16px;border-top:1px solid #1f2937;font-size:10px;color:#374151}
+.sidebar-footer strong{color:#4b5563}
+
+/* Top bar */
+.topbar{padding:14px 24px;border-bottom:1px solid #1f2937;display:flex;align-items:center;justify-content:space-between;background:#09091a;flex-shrink:0}
+.topbar-title{font-size:15px;font-weight:700;color:#fff}
+.topbar-sub{font-size:11px;color:#4b5563;margin-top:2px}
+.topbar-actions{display:flex;gap:8px}
+
+/* Tabs content */
+.tab-content{display:none;padding:24px;flex:1}
+.tab-content.active{display:block}
+
+/* Stats row */
+.stats-row{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.stat-card{background:#0d0d18;border:1px solid #1f2937;border-radius:10px;padding:14px 18px;min-width:120px;flex:1}
+.stat-val{font-size:24px;font-weight:800;color:#fff;letter-spacing:-1px}
+.stat-label{font-size:10px;color:#6b7280;margin-top:3px;text-transform:uppercase;letter-spacing:.8px}
+.stat-delta{font-size:10px;margin-top:4px}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+.btn-primary{background:#6366f1;color:#fff}
+.btn-primary:hover{background:#4f46e5}
+.btn-secondary{background:rgba(255,255,255,0.06);color:#d1d5db;border:1px solid #1f2937}
+.btn-secondary:hover{background:rgba(255,255,255,0.1)}
+.btn-green{background:#059669;color:#fff}
+.btn-green:hover{background:#047857}
+.btn-orange{background:#d97706;color:#fff}
+.btn-orange:hover{background:#b45309}
+.btn-sm{padding:4px 10px;font-size:11px}
+.btn-danger{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.2)}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
+
+/* Tables */
+.table-wrap{background:#0d0d18;border:1px solid #1f2937;border-radius:10px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+th{padding:10px 14px;text-align:left;font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid #1f2937;background:#0a0a16}
+td{padding:9px 14px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,0.02)}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
+.badge-green{background:rgba(16,185,129,0.12);color:#34d399;border:1px solid rgba(16,185,129,0.2)}
+.badge-yellow{background:rgba(245,158,11,0.12);color:#fbbf24;border:1px solid rgba(245,158,11,0.2)}
+.badge-red{background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.2)}
+.badge-blue{background:rgba(99,102,241,0.12);color:#818cf8;border:1px solid rgba(99,102,241,0.2)}
+.badge-gray{background:rgba(156,163,175,0.1);color:#9ca3af;border:1px solid rgba(156,163,175,0.15)}
+.badge-orange{background:rgba(249,115,22,0.12);color:#fb923c;border:1px solid rgba(249,115,22,0.2)}
+
+/* Forms */
+.form-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.form-group{display:flex;flex-direction:column;gap:5px;flex:1;min-width:160px}
+label{font-size:11px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+input,select,textarea{background:#111827;border:1px solid #1f2937;border-radius:7px;padding:8px 11px;color:#e5e7eb;font-size:12px;outline:none;transition:border .15s;font-family:inherit}
+input:focus,select:focus,textarea:focus{border-color:#6366f1}
+textarea{resize:vertical;min-height:80px}
+
+/* Upload zone */
+.upload-zone{border:2px dashed #1f2937;border-radius:10px;padding:32px;text-align:center;cursor:pointer;transition:all .2s}
+.upload-zone:hover,.upload-zone.dragover{border-color:#6366f1;background:rgba(99,102,241,0.05)}
+.upload-zone p{color:#6b7280;font-size:12px;margin-top:8px}
+
+/* Email preview */
+.email-preview{background:#0d0d18;border:1px solid #1f2937;border-radius:10px;padding:16px;margin-bottom:12px}
+.email-subject{font-size:13px;font-weight:600;color:#fff;margin-bottom:8px}
+.email-body{font-size:12px;color:#9ca3af;line-height:1.7;white-space:pre-wrap}
+.email-label{font-size:10px;color:#4b5563;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+
+/* Sequence steps */
+.sequence-steps{display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+.seq-step{background:#111827;border:1px solid #1f2937;border-radius:7px;padding:6px 12px;font-size:11px;font-weight:600;color:#6b7280;cursor:pointer;transition:all .15s}
+.seq-step.active{background:rgba(99,102,241,0.15);border-color:#6366f1;color:#818cf8}
+.seq-arrow{color:#374151;font-size:14px}
+
+/* Alert */
+.alert{padding:10px 14px;border-radius:8px;font-size:12px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.alert-info{background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.2);color:#a5b4fc}
+.alert-success{background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:#6ee7b7}
+.alert-warn{background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);color:#fcd34d}
+.alert-error{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#fca5a5}
+
+/* Section headers */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-title{font-size:14px;font-weight:700;color:#fff}
+.section-sub{font-size:11px;color:#4b5563;margin-top:2px}
+
+/* Corpus card */
+.corpus-card{background:#0d0d18;border:1px solid #1f2937;border-radius:10px;padding:16px;margin-bottom:12px}
+.corpus-card h3{font-size:12px;font-weight:700;color:#fff;margin-bottom:10px;text-transform:capitalize}
+.pain-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:11px;color:#9ca3af;line-height:1.5}
+.pain-item:last-child{border-bottom:none}
+.pain-dot{width:6px;height:6px;border-radius:50%;background:#6366f1;flex-shrink:0;margin-top:4px}
+
+/* Modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:#0d0d18;border:1px solid #1f2937;border-radius:14px;width:680px;max-height:85vh;overflow-y:auto;padding:24px}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.modal-title{font-size:15px;font-weight:700;color:#fff}
+.modal-close{cursor:pointer;color:#6b7280;font-size:18px;line-height:1}
+.modal-close:hover{color:#fff}
+
+/* Loader */
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.2);border-top-color:#6366f1;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Misc */
+.text-muted{color:#6b7280}
+.text-sm{font-size:11px}
+.mono{font-family:'SF Mono',monospace;font-size:11px}
+.divider{height:1px;background:#1f2937;margin:16px 0}
+.empty-state{text-align:center;padding:48px 24px;color:#4b5563}
+.empty-state .empty-icon{font-size:32px;margin-bottom:12px}
+.tier1-row{background:rgba(16,185,129,0.02)}
+.tier2-row{background:rgba(245,158,11,0.02)}
+.filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.filter-select{background:#111827;border:1px solid #1f2937;border-radius:7px;padding:6px 10px;color:#e5e7eb;font-size:11px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="logo">
+    <h2>Outreach Agent</h2>
+    <p>B2B · 10k emails/day</p>
+  </div>
+  <nav class="nav">
+    <div class="nav-item active" onclick="showTab('dashboard')"><span class="nav-icon">📊</span> Dashboard</div>
+    <div class="nav-item" onclick="showTab('leads')"><span class="nav-icon">👥</span> Leads</div>
+    <div class="nav-item" onclick="showTab('sequences')"><span class="nav-icon">✉️</span> Sequences</div>
+    <div class="nav-item" onclick="showTab('corpus')"><span class="nav-icon">🧠</span> Corpus</div>
+    <div class="nav-item" onclick="showTab('instantly')"><span class="nav-icon">🚀</span> Instantly</div>
+    <div class="nav-item" onclick="showTab('settings')"><span class="nav-icon">⚙️</span> Settings</div>
+  </nav>
+  <div class="sidebar-footer">
+    <strong>anmol@attentive.ai</strong><br>v1.0.0
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+<!-- Top bar -->
+<div class="topbar">
+  <div>
+    <div class="topbar-title" id="topbar-title">Dashboard</div>
+    <div class="topbar-sub" id="topbar-sub">Overview of your outreach pipeline</div>
+  </div>
+  <div class="topbar-actions" id="topbar-actions"></div>
+</div>
+
+<!-- ═══════════════════════════════════ DASHBOARD ═══════════════════════════════════ -->
+<div id="tab-dashboard" class="tab-content active">
+
+  <div class="stats-row" id="stats-row">
+    <div class="stat-card"><div class="stat-val">—</div><div class="stat-label">Total Leads</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:#34d399">—</div><div class="stat-label">Enriched</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:#818cf8">—</div><div class="stat-label">Sequenced</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:#f97316">—</div><div class="stat-label">Sent</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:#fbbf24">—</div><div class="stat-label">Replied</div></div>
+    <div class="stat-card"><div class="stat-val" style="color:#10b981">—</div><div class="stat-label">Meetings</div></div>
+  </div>
+
+  <div style="display:flex;gap:16px;flex-wrap:wrap">
+    <div style="flex:1;min-width:280px">
+      <div class="section-header"><div><div class="section-title">Leads by Tier</div></div></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Tier</th><th>Description</th><th>Count</th><th>Cost/email</th></tr></thead>
+          <tbody id="tier-breakdown">
+            <tr><td colspan="4" class="text-muted" style="text-align:center;padding:20px;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div style="flex:1;min-width:280px">
+      <div class="section-header"><div><div class="section-title">Leads by Trade</div></div></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Trade</th><th>Count</th><th>% of Total</th></tr></thead>
+          <tbody id="trade-breakdown">
+            <tr><td colspan="3" class="text-muted" style="text-align:center;padding:20px;">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-header">
+    <div><div class="section-title">Quick Actions</div></div>
+  </div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <button class="btn btn-primary" onclick="showTab('leads')">+ Import Leads</button>
+    <button class="btn btn-secondary" onclick="enrichAll()">⚡ Enrich All Pending</button>
+    <button class="btn btn-secondary" onclick="showTab('sequences')">✉️ Generate Sequences</button>
+    <button class="btn btn-green" onclick="showTab('instantly')">🚀 Push to Instantly</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ LEADS ═══════════════════════════════════ -->
+<div id="tab-leads" class="tab-content">
+
+  <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px">
+    <!-- Upload -->
+    <div style="flex:1;min-width:300px">
+      <div class="section-header"><div class="section-title">Import CSV</div></div>
+      <div class="upload-zone" id="upload-zone" onclick="document.getElementById('csv-input').click()">
+        <div style="font-size:24px">📂</div>
+        <p>Click to upload CSV or drag & drop</p>
+        <p style="font-size:10px;margin-top:4px;color:#374151">Columns: company_name, domain, email, first_name, last_name, title, industry, headcount, country, linkedin_url</p>
+        <input type="file" id="csv-input" accept=".csv" style="display:none" onchange="handleCSVUpload(event)">
+      </div>
+      <div id="import-result" style="margin-top:10px"></div>
+    </div>
+
+    <!-- Manual add -->
+    <div style="flex:1;min-width:300px">
+      <div class="section-header"><div class="section-title">Add Single Lead</div></div>
+      <div class="form-row">
+        <div class="form-group"><label>Company</label><input id="add-company" placeholder="Acme Roofing Co."></div>
+        <div class="form-group"><label>Domain</label><input id="add-domain" placeholder="acmeroofing.com"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>First Name</label><input id="add-fname" placeholder="John"></div>
+        <div class="form-group"><label>Last Name</label><input id="add-lname" placeholder="Smith"></div>
+        <div class="form-group"><label>Email</label><input id="add-email" placeholder="john@acmeroofing.com"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Title</label><input id="add-title" placeholder="Estimator"></div>
+        <div class="form-group"><label>Industry</label><input id="add-industry" placeholder="Roofing"></div>
+        <div class="form-group"><label>Headcount</label><input id="add-headcount" type="number" placeholder="25"></div>
+        <div class="form-group"><label>Country</label><input id="add-country" placeholder="United States"></div>
+      </div>
+      <button class="btn btn-primary" onclick="addLead()">Add Lead</button>
+    </div>
+  </div>
+
+  <!-- Filters + table -->
+  <div class="section-header">
+    <div><div class="section-title">All Leads</div></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-secondary btn-sm" onclick="enrichAll()">⚡ Enrich All Pending</button>
+      <button class="btn btn-secondary btn-sm" onclick="loadLeads()">↻ Refresh</button>
+    </div>
+  </div>
+
+  <div class="filters">
+    <select class="filter-select" id="filter-status" onchange="loadLeads()">
+      <option value="">All Statuses</option>
+      <option value="new">New</option>
+      <option value="enriched">Enriched</option>
+      <option value="sequenced">Sequenced</option>
+      <option value="sent">Sent</option>
+      <option value="replied">Replied</option>
+      <option value="booked">Booked</option>
+    </select>
+    <select class="filter-select" id="filter-tier" onchange="loadLeads()">
+      <option value="">All Tiers</option>
+      <option value="1">Tier 1 (Strong Fit)</option>
+      <option value="2">Tier 2 (Possible Fit)</option>
+      <option value="3">Tier 3 (Broad)</option>
+    </select>
+    <select class="filter-select" id="filter-trade" onchange="loadLeads()">
+      <option value="">All Trades</option>
+    </select>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="select-all" onchange="toggleSelectAll(this)"></th>
+          <th>Company</th><th>Contact</th><th>Trade</th>
+          <th>ICP</th><th>Tier</th><th>Status</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="leads-tbody">
+        <tr><td colspan="8" class="empty-state"><div class="empty-icon">👥</div>No leads yet. Import a CSV or add manually.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="margin-top:12px;display:flex;gap:8px" id="bulk-actions" style="display:none">
+    <button class="btn btn-secondary btn-sm" onclick="bulkGenerateSequences()">✉️ Generate Sequences for Selected</button>
+    <button class="btn btn-green btn-sm" onclick="bulkPushInstantly()">🚀 Push Selected to Instantly</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ SEQUENCES ═══════════════════════════════════ -->
+<div id="tab-sequences" class="tab-content">
+
+  <div style="display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap">
+    <div style="flex:1">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Generate Sequences</div>
+          <div class="section-sub">AI writes personalized 5-touch sequences per lead</div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tier</label>
+          <select id="gen-tier">
+            <option value="">All Tiers</option>
+            <option value="1">Tier 1 — Full Custom (Claude, ~$0.003)</option>
+            <option value="2">Tier 2 — Trade-Segmented (Gemini, ~$0.0005)</option>
+            <option value="3">Tier 3 — Template Merge (Free)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Trade</label>
+          <select id="gen-trade">
+            <option value="">All Trades</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Limit</label>
+          <input type="number" id="gen-limit" value="20" min="1" max="500">
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="generateBulkSequences()" id="gen-btn">✉️ Generate Sequences</button>
+      <div id="gen-result" style="margin-top:10px"></div>
+    </div>
+
+    <!-- Preview generator -->
+    <div style="flex:1;min-width:300px">
+      <div class="section-header"><div class="section-title">Preview Generator</div></div>
+      <div class="form-row">
+        <div class="form-group"><label>Company</label><input id="prev-company" placeholder="Acme HVAC"></div>
+        <div class="form-group"><label>First Name</label><input id="prev-fname" placeholder="John"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Trade</label>
+          <select id="prev-trade">
+            <option value="hvac">HVAC</option>
+            <option value="plumbing">Plumbing</option>
+            <option value="electrical">Electrical</option>
+            <option value="roofing">Roofing</option>
+            <option value="steel">Steel</option>
+            <option value="concrete">Concrete</option>
+            <option value="painting">Painting</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Tier</label>
+          <select id="prev-tier">
+            <option value="1">Tier 1 (Claude)</option>
+            <option value="2">Tier 2 (Gemini)</option>
+            <option value="3">Tier 3 (Template)</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-secondary" onclick="previewSequence()" id="prev-btn">👁 Preview</button>
+    </div>
+  </div>
+
+  <!-- Sequence viewer -->
+  <div id="sequence-viewer" style="display:none">
+    <div class="divider"></div>
+    <div class="section-header">
+      <div class="section-title" id="seq-viewer-title">Sequence Preview</div>
+    </div>
+    <div class="sequence-steps">
+      <div class="seq-step active" onclick="showSeqStep(0)">D1 Email</div>
+      <div class="seq-arrow">›</div>
+      <div class="seq-step" onclick="showSeqStep(1)">D3 LinkedIn</div>
+      <div class="seq-arrow">›</div>
+      <div class="seq-step" onclick="showSeqStep(2)">D5 Follow-up</div>
+      <div class="seq-arrow">›</div>
+      <div class="seq-step" onclick="showSeqStep(3)">D8 Call Note</div>
+      <div class="seq-arrow">›</div>
+      <div class="seq-step" onclick="showSeqStep(4)">D14 Breakup</div>
+    </div>
+    <div id="seq-step-content"></div>
+  </div>
+
+  <!-- Sequenced leads -->
+  <div class="divider"></div>
+  <div class="section-header">
+    <div class="section-title">Sequenced Leads</div>
+    <button class="btn btn-secondary btn-sm" onclick="loadSequencedLeads()">↻ Refresh</button>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Company</th><th>Contact</th><th>Trade</th><th>Tier</th><th>Sequenced</th><th>Actions</th></tr></thead>
+      <tbody id="sequenced-tbody">
+        <tr><td colspan="6" class="empty-state"><div class="empty-icon">✉️</div>No sequences yet.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ CORPUS ═══════════════════════════════════ -->
+<div id="tab-corpus" class="tab-content">
+  <div class="section-header">
+    <div>
+      <div class="section-title">Corpus Intelligence</div>
+      <div class="section-sub">Trade-specific pain points, objections, and winning language extracted from your deal data</div>
+    </div>
+  </div>
+  <div id="corpus-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px">
+    <div class="text-muted">Loading corpus...</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ INSTANTLY ═══════════════════════════════════ -->
+<div id="tab-instantly" class="tab-content">
+
+  <div id="instantly-validation" class="alert alert-info" style="margin-bottom:16px">
+    Checking Instantly connection...
+  </div>
+
+  <div style="display:flex;gap:16px;flex-wrap:wrap">
+    <div style="flex:1;min-width:300px">
+      <div class="section-header"><div class="section-title">Push to Campaign</div></div>
+      <div class="form-group" style="margin-bottom:12px">
+        <label>Campaign</label>
+        <select id="campaign-select">
+          <option value="">Loading campaigns...</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Filter by Tier</label>
+          <select id="push-tier">
+            <option value="">All Tiers</option>
+            <option value="1">Tier 1</option>
+            <option value="2">Tier 2</option>
+            <option value="3">Tier 3</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Filter by Trade</label>
+          <select id="push-trade">
+            <option value="">All Trades</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Max Leads</label>
+          <input type="number" id="push-limit" value="100" min="1" max="1000">
+        </div>
+      </div>
+      <button class="btn btn-green" onclick="pushBulkToInstantly()" id="push-btn">🚀 Push Sequenced Leads</button>
+      <div id="push-result" style="margin-top:10px"></div>
+    </div>
+
+    <div style="flex:1;min-width:280px">
+      <div class="section-header"><div class="section-title">Campaign Stats</div></div>
+      <div id="campaign-stats" class="text-muted text-sm">Select a campaign to see stats</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <div class="section-header">
+    <div>
+      <div class="section-title">Webhook URL</div>
+      <div class="section-sub">Add this to Instantly to track opens, replies, and meetings</div>
+    </div>
+  </div>
+  <div style="background:#111827;border:1px solid #1f2937;border-radius:8px;padding:12px 14px;font-family:'SF Mono',monospace;font-size:11px;color:#818cf8;display:flex;align-items:center;justify-content:space-between">
+    <span id="webhook-url">http://localhost:3002/api/instantly/webhook</span>
+    <button class="btn btn-secondary btn-sm" onclick="copyWebhook()">Copy</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ SETTINGS ═══════════════════════════════════ -->
+<div id="tab-settings" class="tab-content">
+  <div class="section-header"><div class="section-title">API Keys & Configuration</div></div>
+
+  <div style="max-width:560px">
+    <div class="alert alert-warn">Keys are stored in your .env file. Update them there and restart the server.</div>
+
+    <div class="form-group" style="margin-bottom:14px">
+      <label>OpenRouter API Key (Claude + Gemini)</label>
+      <input type="password" id="s-openrouter" placeholder="sk-or-..." readonly>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>ZoomInfo Client ID</label>
+        <input type="password" id="s-zi-id" placeholder="Set in .env" readonly>
+      </div>
+      <div class="form-group">
+        <label>ZoomInfo Client Secret</label>
+        <input type="password" id="s-zi-secret" placeholder="Set in .env" readonly>
+      </div>
+    </div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label>Instantly API Key</label>
+      <input type="password" id="s-instantly" placeholder="Set in .env" readonly>
+    </div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label>Corpus Path (beam-predictive-sales-agent)</label>
+      <input id="s-corpus" value="/Users/anmol/beam-predictive-sales-agent/data/corpus" readonly>
+    </div>
+    <div class="divider"></div>
+    <div class="section-title" style="margin-bottom:12px">5-Touch Sequence Schedule</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Day</th><th>Channel</th><th>Touch</th><th>Tier</th></tr></thead>
+        <tbody>
+          <tr><td>D1</td><td>📧 Email</td><td>Cold intro — trade pain hook</td><td>All</td></tr>
+          <tr><td>D3</td><td>🔗 LinkedIn</td><td>Connection request + note</td><td>All</td></tr>
+          <tr><td>D5</td><td>📧 Email</td><td>Follow-up — result/case study angle</td><td>All</td></tr>
+          <tr><td>D8</td><td>📞 Call</td><td>AI dialer (Nooks) — Tier 1 only</td><td>Tier 1</td></tr>
+          <tr><td>D14</td><td>📧 Email</td><td>Breakup — last touch, leave door open</td><td>All</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div><!-- end main -->
+</div><!-- end shell -->
+
+<!-- Lead sequence modal -->
+<div class="modal-bg" id="lead-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Lead Sequence</div>
+      <div class="modal-close" onclick="closeModal()">✕</div>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+const API = '/api';
+let _leads = [];
+let _currentSequence = null;
+let _selectedLeads = new Set();
+
+// ── Tab navigation ───────────────────────────────────────────────────────────
+const TAB_META = {
+  dashboard: { title: 'Dashboard', sub: 'Overview of your outreach pipeline' },
+  leads: { title: 'Leads', sub: 'Import, enrich, and manage your lead list' },
+  sequences: { title: 'Sequences', sub: 'Generate AI-personalized 5-touch sequences' },
+  corpus: { title: 'Corpus Intelligence', sub: 'Trade-specific patterns extracted from your deal data' },
+  instantly: { title: 'Instantly', sub: 'Push leads to email campaigns and track replies' },
+  settings: { title: 'Settings', sub: 'API keys and configuration' },
+};
+
+function showTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelector(`.nav-item[onclick="showTab('${tab}')"]`).classList.add('active');
+  const meta = TAB_META[tab] || {};
+  document.getElementById('topbar-title').textContent = meta.title || tab;
+  document.getElementById('topbar-sub').textContent = meta.sub || '';
+
+  if (tab === 'dashboard') loadDashboard();
+  if (tab === 'leads') loadLeads();
+  if (tab === 'sequences') { loadSequencedLeads(); populateTradeSelects(); }
+  if (tab === 'corpus') loadCorpus();
+  if (tab === 'instantly') loadInstantly();
+}
+
+// ── Utils ────────────────────────────────────────────────────────────────────
+function setAlert(elId, msg, type = 'info') {
+  const el = document.getElementById(elId);
+  if (el) el.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+}
+
+function tierBadge(tier) {
+  if (tier === 1) return '<span class="badge badge-green">T1</span>';
+  if (tier === 2) return '<span class="badge badge-yellow">T2</span>';
+  return '<span class="badge badge-gray">T3</span>';
+}
+
+function statusBadge(s) {
+  const map = {
+    new: 'badge-gray', enriched: 'badge-blue', sequenced: 'badge-blue',
+    sent: 'badge-orange', replied: 'badge-yellow', booked: 'badge-green',
+  };
+  return `<span class="badge ${map[s] || 'badge-gray'}">${s}</span>`;
+}
+
+function icpBadge(status, score) {
+  const cls = status === 'ICP' ? 'badge-green' : status === 'Needs Review' ? 'badge-yellow' : 'badge-red';
+  return `<span class="badge ${cls}">${score || 0}</span>`;
+}
+
+async function apiFetch(path, opts = {}) {
+  const res = await fetch(API + path, { headers: { 'Content-Type': 'application/json' }, ...opts });
+  return res.json();
+}
+
+// ── Dashboard ────────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  const stats = await apiFetch('/stats');
+  const byStatus = {};
+  (stats.byStatus || []).forEach(r => byStatus[r.status] = r.n);
+
+  const cards = [
+    { val: stats.total || 0, label: 'Total Leads', color: '' },
+    { val: byStatus.enriched || 0, label: 'Enriched', color: '#34d399' },
+    { val: byStatus.sequenced || 0, label: 'Sequenced', color: '#818cf8' },
+    { val: byStatus.sent || 0, label: 'Sent', color: '#f97316' },
+    { val: byStatus.replied || 0, label: 'Replied', color: '#fbbf24' },
+    { val: byStatus.booked || 0, label: 'Meetings', color: '#10b981' },
+  ];
+
+  document.getElementById('stats-row').innerHTML = cards.map(c =>
+    `<div class="stat-card"><div class="stat-val" style="color:${c.color || '#fff'}">${c.val}</div><div class="stat-label">${c.label}</div></div>`
+  ).join('');
+
+  // Tier breakdown
+  const tierMap = { 1: { label: 'Full Custom (Claude)', cost: '~$0.003' }, 2: { label: 'Trade-Segmented (Gemini)', cost: '~$0.0005' }, 3: { label: 'Template Merge', cost: '$0' } };
+  document.getElementById('tier-breakdown').innerHTML = (stats.byTier || []).map(r => {
+    const t = tierMap[r.tier] || { label: 'Unknown', cost: '' };
+    return `<tr><td>${tierBadge(r.tier)}</td><td class="text-muted">${t.label}</td><td style="font-weight:700">${r.n}</td><td class="text-muted">${t.cost}</td></tr>`;
+  }).join('') || '<tr><td colspan="4" class="text-muted" style="text-align:center;padding:16px">No leads yet</td></tr>';
+
+  // Trade breakdown
+  const total = stats.total || 1;
+  document.getElementById('trade-breakdown').innerHTML = (stats.byTrade || []).slice(0, 10).map(r =>
+    `<tr><td style="text-transform:capitalize">${r.trade}</td><td style="font-weight:700">${r.n}</td><td class="text-muted">${Math.round(r.n / total * 100)}%</td></tr>`
+  ).join('') || '<tr><td colspan="3" class="text-muted" style="text-align:center;padding:16px">No leads yet</td></tr>';
+}
+
+// ── Leads ────────────────────────────────────────────────────────────────────
+async function loadLeads() {
+  const status = document.getElementById('filter-status')?.value || '';
+  const tier = document.getElementById('filter-tier')?.value || '';
+  const trade = document.getElementById('filter-trade')?.value || '';
+
+  const params = new URLSearchParams();
+  if (status) params.set('status', status);
+  if (tier) params.set('tier', tier);
+  if (trade) params.set('trade', trade);
+
+  const data = await apiFetch('/leads?' + params);
+  _leads = data.leads || [];
+
+  const tbody = document.getElementById('leads-tbody');
+  if (!_leads.length) {
+    tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">👥</div>No leads found.</div></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = _leads.map(l => `
+    <tr class="${l.tier === 1 ? 'tier1-row' : l.tier === 2 ? 'tier2-row' : ''}">
+      <td><input type="checkbox" class="lead-cb" data-id="${l.id}" onchange="toggleLead(this)"></td>
+      <td>
+        <div style="font-weight:600;color:#e5e7eb">${l.company_name || '—'}</div>
+        <div class="text-muted text-sm">${l.domain || ''}</div>
+      </td>
+      <td>
+        <div>${l.first_name || ''} ${l.last_name || ''}</div>
+        <div class="text-muted text-sm">${l.title || ''}</div>
+        <div class="text-muted text-sm mono">${l.email || ''}</div>
+      </td>
+      <td><span style="text-transform:capitalize">${l.trade || '—'}</span></td>
+      <td>${icpBadge(l.icp_status, l.icp_score)}</td>
+      <td>${tierBadge(l.tier)}</td>
+      <td>${statusBadge(l.status)}</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-secondary btn-sm" onclick="enrichLead('${l.id}','${l.domain}')">Enrich</button>
+          <button class="btn btn-secondary btn-sm" onclick="generateSequence('${l.id}')">Seq</button>
+          <button class="btn btn-secondary btn-sm" onclick="viewLead('${l.id}')">View</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function toggleLead(cb) {
+  if (cb.checked) _selectedLeads.add(cb.dataset.id);
+  else _selectedLeads.delete(cb.dataset.id);
+}
+
+function toggleSelectAll(cb) {
+  document.querySelectorAll('.lead-cb').forEach(c => {
+    c.checked = cb.checked;
+    if (cb.checked) _selectedLeads.add(c.dataset.id);
+    else _selectedLeads.delete(c.dataset.id);
+  });
+}
+
+async function addLead() {
+  const lead = {
+    company_name: document.getElementById('add-company').value,
+    domain: document.getElementById('add-domain').value,
+    first_name: document.getElementById('add-fname').value,
+    last_name: document.getElementById('add-lname').value,
+    email: document.getElementById('add-email').value,
+    title: document.getElementById('add-title').value,
+    industry: document.getElementById('add-industry').value,
+    headcount: document.getElementById('add-headcount').value,
+    country: document.getElementById('add-country').value,
+  };
+  await apiFetch('/leads', { method: 'POST', body: JSON.stringify(lead) });
+  loadLeads();
+}
+
+async function handleCSVUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const form = new FormData();
+  form.append('file', file);
+  setAlert('import-result', '<span class="spinner"></span> Importing...', 'info');
+  const res = await fetch(API + '/import', { method: 'POST', body: form });
+  const data = await res.json();
+  setAlert('import-result', `✅ Imported ${data.imported} leads`, 'success');
+  loadLeads();
+}
+
+const dropZone = document.getElementById('upload-zone');
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) {
+    const input = document.getElementById('csv-input');
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    input.files = dt.files;
+    handleCSVUpload({ target: input });
+  }
+});
+
+async function enrichLead(id, domain) {
+  if (!domain) { alert('No domain for this lead'); return; }
+  const data = await apiFetch('/enrich', { method: 'POST', body: JSON.stringify({ domain, lead_id: id }) });
+  loadLeads();
+}
+
+async function enrichAll() {
+  await apiFetch('/enrich-all', { method: 'POST', body: JSON.stringify({}) });
+  setTimeout(loadLeads, 2000);
+}
+
+async function generateSequence(leadId) {
+  const btn = event.target;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>';
+  const data = await apiFetch('/sequence/' + leadId, { method: 'POST', body: JSON.stringify({}) });
+  btn.disabled = false;
+  btn.textContent = 'Seq ✓';
+  if (data.sequence) openSequenceModal(data.sequence, leadId);
+  loadLeads();
+}
+
+async function viewLead(id) {
+  const data = await apiFetch('/leads/' + id);
+  const { lead, sequence } = data;
+  document.getElementById('modal-title').textContent = lead.company_name || 'Lead';
+  let html = `
+    <div class="form-row">
+      <div><div class="text-muted text-sm">Company</div><div style="font-weight:600">${lead.company_name}</div></div>
+      <div><div class="text-muted text-sm">Email</div><div class="mono">${lead.email || '—'}</div></div>
+      <div><div class="text-muted text-sm">ICP Score</div><div>${icpBadge(lead.icp_status, lead.icp_score)}</div></div>
+      <div><div class="text-muted text-sm">Tier</div><div>${tierBadge(lead.tier)}</div></div>
+    </div>
+  `;
+  if (sequence) html += renderSequenceInModal(sequence);
+  document.getElementById('modal-body').innerHTML = html;
+  document.getElementById('lead-modal').classList.add('open');
+}
+
+// ── Sequences ────────────────────────────────────────────────────────────────
+function populateTradeSelects() {
+  const trades = ['hvac','plumbing','electrical','roofing','steel','concrete','flooring','painting','insulation','construction'];
+  ['filter-trade','gen-trade','push-trade','prev-trade'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el || el.options.length > 2) return;
+    trades.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t; opt.textContent = t.charAt(0).toUpperCase() + t.slice(1);
+      el.appendChild(opt);
+    });
+  });
+}
+
+async function generateBulkSequences() {
+  const tier = document.getElementById('gen-tier').value;
+  const trade = document.getElementById('gen-trade').value;
+  const limit = document.getElementById('gen-limit').value;
+  const btn = document.getElementById('gen-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Generating...';
+  setAlert('gen-result', '⚡ Generating sequences asynchronously — check the Leads tab in a moment', 'info');
+  await apiFetch('/sequence-all', { method: 'POST', body: JSON.stringify({ tier: tier ? Number(tier) : undefined, trade: trade || undefined, limit: Number(limit) }) });
+  btn.disabled = false;
+  btn.textContent = '✉️ Generate Sequences';
+  setTimeout(loadSequencedLeads, 3000);
+}
+
+async function previewSequence() {
+  const btn = document.getElementById('prev-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Generating...';
+  const lead = {
+    company_name: document.getElementById('prev-company').value || 'Acme HVAC',
+    first_name: document.getElementById('prev-fname').value || 'John',
+    trade: document.getElementById('prev-trade').value,
+    tier: Number(document.getElementById('prev-tier').value),
+    industry: document.getElementById('prev-trade').value,
+    headcount: 25,
+    country: 'United States',
+  };
+  const data = await apiFetch('/sequence/preview', { method: 'POST', body: JSON.stringify({ lead }) });
+  btn.disabled = false;
+  btn.textContent = '👁 Preview';
+  if (data.sequence) {
+    _currentSequence = data.sequence;
+    document.getElementById('sequence-viewer').style.display = 'block';
+    document.getElementById('seq-viewer-title').textContent = `Sequence for ${lead.first_name} at ${lead.company_name}`;
+    showSeqStep(0);
+  }
+}
+
+function showSeqStep(idx) {
+  document.querySelectorAll('.seq-step').forEach((s, i) => s.classList.toggle('active', i === idx));
+  const s = _currentSequence;
+  if (!s) return;
+  const steps = [
+    { label: 'D1 — Cold Email (Instantly)', subj: s.email_1_subject, body: s.email_1_body, subjB: s.email_1_subject_b, ps: s.email_1_ps },
+    { label: 'D3 — LinkedIn Connection Note (HeyReach)', body: s.linkedin_note },
+    { label: 'D5 — Follow-up Email (Instantly)', subj: s.email_2_subject, body: s.email_2_body },
+    { label: 'D8 — Call Note (Nooks — Tier 1 only)', body: 'AI dialer call — reference the first email and ask to schedule a 15-min demo.' },
+    { label: 'D14 — Breakup Email (Instantly)', subj: s.email_3_subject, body: s.email_3_body },
+  ];
+  const step = steps[idx];
+  let html = `<div class="email-label">${step.label}</div>`;
+  if (step.subj) html += `<div class="email-preview"><div class="email-label">Subject A</div><div class="email-subject">${esc(step.subj)}</div>${step.subjB ? `<div class="email-label" style="margin-top:10px">Subject B</div><div class="email-subject">${esc(step.subjB)}</div>` : ''}</div>`;
+  html += `<div class="email-preview"><div class="email-label">${step.subj ? 'Body' : 'Message'}</div><div class="email-body">${esc(step.body || '')}</div>${step.ps ? `<div class="email-label" style="margin-top:10px">PS</div><div class="email-body">${esc(step.ps)}</div>` : ''}</div>`;
+  document.getElementById('seq-step-content').innerHTML = html;
+}
+
+async function loadSequencedLeads() {
+  const data = await apiFetch('/leads?status=sequenced');
+  const tbody = document.getElementById('sequenced-tbody');
+  const leads = data.leads || [];
+  if (!leads.length) {
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">✉️</div>No sequenced leads yet.</div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = leads.map(l => `
+    <tr>
+      <td><div style="font-weight:600">${l.company_name}</div><div class="text-muted text-sm">${l.domain || ''}</div></td>
+      <td>${l.first_name || ''} ${l.last_name || ''}<br><span class="text-muted text-sm">${l.title || ''}</span></td>
+      <td style="text-transform:capitalize">${l.trade || '—'}</td>
+      <td>${tierBadge(l.tier)}</td>
+      <td class="text-muted text-sm">${l.sequenced_at ? new Date(l.sequenced_at).toLocaleDateString() : '—'}</td>
+      <td><button class="btn btn-secondary btn-sm" onclick="viewLead('${l.id}')">View</button></td>
+    </tr>
+  `).join('');
+}
+
+function openSequenceModal(seq, leadId) {
+  _currentSequence = seq;
+  document.getElementById('sequence-viewer').style.display = 'block';
+  showSeqStep(0);
+  showTab('sequences');
+}
+
+function renderSequenceInModal(seq) {
+  return `
+    <div class="divider"></div>
+    <div class="email-label">D1 Email</div>
+    <div class="email-preview"><div class="email-subject">${esc(seq.email_1_subject || '')}</div><div class="email-body">${esc(seq.email_1_body || '')}</div></div>
+    <div class="email-label">D3 LinkedIn Note</div>
+    <div class="email-preview"><div class="email-body">${esc(seq.linkedin_note || '')}</div></div>
+    <div class="email-label">D5 Follow-up</div>
+    <div class="email-preview"><div class="email-subject">${esc(seq.email_2_subject || '')}</div><div class="email-body">${esc(seq.email_2_body || '')}</div></div>
+  `;
+}
+
+// ── Corpus ────────────────────────────────────────────────────────────────────
+async function loadCorpus() {
+  const trades = ['hvac','plumbing','electrical','roofing','steel','concrete','flooring','painting','insulation','construction'];
+  const grid = document.getElementById('corpus-grid');
+  const results = await Promise.all(trades.map(t => apiFetch('/corpus/' + t).catch(() => null)));
+
+  grid.innerHTML = results.map((data, i) => {
+    if (!data) return '';
+    const trade = trades[i];
+    const ctx = data.context || {};
+    const pains = (ctx.pain_points || []).slice(0, 4);
+    const hooks = (ctx.value_hooks || []).slice(0, 2);
+    return `
+      <div class="corpus-card">
+        <h3>${trade} <span class="text-muted text-sm">— ${data.deal_count || 0} deals</span></h3>
+        <div class="email-label" style="margin-bottom:5px">Pain Points</div>
+        ${pains.map(p => `<div class="pain-item"><div class="pain-dot"></div><div>${p}</div></div>`).join('')}
+        <div style="margin-top:10px">
+          <div class="email-label" style="margin-bottom:5px">Value Hooks</div>
+          ${hooks.map(h => `<div class="pain-item"><div class="pain-dot" style="background:#10b981"></div><div>${h}</div></div>`).join('')}
+        </div>
+        <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+          ${(ctx.urgency_triggers || []).slice(0,4).map(t => `<span class="badge badge-blue">${t}</span>`).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ── Instantly ────────────────────────────────────────────────────────────────
+async function loadInstantly() {
+  const v = await apiFetch('/instantly/validate');
+  if (v.valid) {
+    document.getElementById('instantly-validation').className = 'alert alert-success';
+    document.getElementById('instantly-validation').textContent = `✅ Instantly connected — Org: ${v.org}`;
+  } else {
+    document.getElementById('instantly-validation').className = 'alert alert-warn';
+    document.getElementById('instantly-validation').textContent = `⚠️ Instantly not connected: ${v.error || 'Set INSTANTLY_API_KEY in .env'}`;
+  }
+
+  const camps = await apiFetch('/instantly/campaigns').catch(() => ({ campaigns: [] }));
+  const select = document.getElementById('campaign-select');
+  const list = camps.campaigns || camps.data || camps || [];
+  select.innerHTML = list.map(c => `<option value="${c.id}">${c.name || c.id}</option>`).join('') || '<option value="">No campaigns found</option>';
+  populateTradeSelects();
+
+  document.getElementById('webhook-url').textContent = `${location.origin}/api/instantly/webhook`;
+}
+
+async function pushBulkToInstantly() {
+  const campaign_id = document.getElementById('campaign-select').value;
+  if (!campaign_id) { alert('Select a campaign first'); return; }
+  const tier = document.getElementById('push-tier').value;
+  const trade = document.getElementById('push-trade').value;
+  const limit = document.getElementById('push-limit').value;
+  const btn = document.getElementById('push-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Pushing...';
+  setAlert('push-result', '⚡ Pushing leads to Instantly asynchronously...', 'info');
+  await apiFetch('/instantly/push-bulk', { method: 'POST', body: JSON.stringify({ campaign_id, tier: tier ? Number(tier) : undefined, trade: trade || undefined, limit: Number(limit) }) });
+  btn.disabled = false;
+  btn.textContent = '🚀 Push Sequenced Leads';
+  setAlert('push-result', '✅ Push started — check Instantly dashboard for results', 'success');
+}
+
+function copyWebhook() {
+  navigator.clipboard.writeText(document.getElementById('webhook-url').textContent);
+}
+
+// ── Modal ────────────────────────────────────────────────────────────────────
+function closeModal() { document.getElementById('lead-modal').classList.remove('open'); }
+document.getElementById('lead-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function esc(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+populateTradeSelects();
+loadDashboard();
+</script>
+</body>
+</html>
